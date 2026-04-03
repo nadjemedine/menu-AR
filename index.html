@@ -3,24 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR 3D Model</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <title>Menu-AR: Sushi 360</title>
+    <!-- Modern A-Frame version -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- Modern AR.js version -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        .arjs-loader {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .arjs-loader div {
+            text-align: center;
+            font-size: 1.25em;
+            color: white;
+            font-family: sans-serif;
+        }
+    </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs>
-        <!-- Marker for AR -->
+    <!-- Loading Screen -->
+    <div class="arjs-loader">
+        <div>Loading 3D Sushi... <br> (Please point camera at HIRO marker)</div>
+    </div>
+
+    <!-- AR Scene -->
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;">
+        
+        <a-assets>
+            <!-- Using direct path, ensuring no space issues -->
+            <a-asset-item id="sushi-model" src="sushi.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Marker for AR (Hiro is default) -->
         <a-marker preset="hiro">
             <!-- 3D Model -->
             <a-entity
-                gltf-model="url(path_to_your_3d_model.glb)"
-                scale="0.5 0.5 0.5"
-                rotation="0 180 0"
-                position="0 0 0">
+                gltf-model="#sushi-model"
+                scale="1 1 1"
+                position="0 0 0"
+                rotation="0 0 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
             </a-entity>
         </a-marker>
-        <!-- Camera for AR -->
+
+        <!-- Lighting -->
+        <a-entity light="type: ambient; color: #FFF; intensity: 0.8"></a-entity>
+        <a-entity light="type: directional; color: #FFF; intensity: 0.5" position="1 2 1"></a-entity>
+
+        <!-- Camera -->
         <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+        // Remove loader when scene is loaded
+        window.addEventListener('load', () => {
+            const loader = document.querySelector('.arjs-loader');
+            if (loader) {
+                // Delay slightly to ensure model is fully rendered
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 </html>
